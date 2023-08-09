@@ -1,0 +1,16 @@
+CREATE TABLE TBl_School(
+	school_number NUMBER,
+	school_name varchar2(1000),
+	CONSTRAINT pk_school PRIMARY KEY(school_number)
+);
+
+DROP TABLE TBL_STUDENT ;
+
+CREATE TABLE TBL_STUDENT(
+	student_number NUMBER,
+	student_name varchar2(1000),
+	student_age NUMBER,
+	school_number NUMBER,
+	CONSTRAINT pk_student PRIMARY KEY(student_number),
+	CONSTRAINT fk_student FOREIGN KEY(school_number) REFERENCES TBL_school(school_number)
+);

@@ -1,0 +1,19 @@
+CREATE TABLE TBL_USER(
+	user_name varchar2(1000),
+	user_age number
+);
+
+--테이블명 수정
+--ALTER TABLE TBL_USER RENAME TO TBL_MY_USER;
+
+-- 컬럼 추가 
+ALTER TABLE TBL_MY_USER ADD user_gender char(4);
+
+--컬럼명 수정
+ALTER  TBL_MY_USER RENAME COLUMN USER_NAME TO USER_NICKNAME;
+
+--컬럼 삭제
+ALTER TABLE TBL_MY_USER DROP COLUMN  user_gender;
+
+--컬럼타입 수정
+ALTER TABLE TBL_MY_USER MODIFY(user_age varchar(500));

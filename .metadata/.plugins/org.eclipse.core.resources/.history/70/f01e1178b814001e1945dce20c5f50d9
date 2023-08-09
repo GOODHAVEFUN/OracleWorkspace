@@ -1,0 +1,42 @@
+--10 || 20; --오류
+--연산 결과를 조회하고 싶은 것이므로 SELECT 를 사용해야 오류가 발생하지 않는다
+
+--연결연산자
+SELECT 10 || 20 , '안녕' || '하세요' FROM dual;
+SELECT '안녕' || '하세요' FROM dual;
+--특정테이블을 확인할 수 없을 때는 DUAL
+--결과가 무슨 타입인지 환인하는것도 중요하다!!
+
+SELECT FIRST_NAME || LAST_NAME AS 성함
+FROM EMPLOYEES;
+
+SELECT HIRE_DATE || '안녕'
+FROM EMPLOYEES;
+
+SELECT HIRE_DATE || ''
+FROM EMPLOYEES;
+
+--[실습] 사원의 이름과 메일 주소 출력하기
+-- 이 떄 이름은 first_name과 last_name이 띄어쓰기오 이어져있고
+-- 메일릐 주소는 사원메일 주소@koreait.com이다
+
+SELECT FIRST_NAME || ' ' || LAST_NAME 이름 ,
+EMAIL ||'@koreait.com' 이메일 
+FROM EMPLOYEES ;
+
+--2. 산술연산자
+SELECT EMPLOYEE_ID , 
+EMPLOYEE_ID + 10 ,
+EMPLOYEE_ID - 10 ,
+EMPLOYEE_ID * 10 ,
+EMPLOYEE_ID / 10 
+FROM EMPLOYEES;
+
+--[실습]
+SELECT 
+	FIRST_NAME || ' ' || LAST_NAME 이름,
+SALARY 봉급,
+SALARY *1.1 인상봉급,
+SALARY *0.9 감축봉급
+FROM EMPLOYEES
+ORDER BY SALARY;

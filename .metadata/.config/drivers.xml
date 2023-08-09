@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<drivers>
+	<provider id="oracle">
+		<driver id="oracle_thin" categories="sql" name="Oracle" class="oracle.jdbc.OracleDriver" url="jdbc:oracle:thin:@{host}[:{port}]/{database}" port="1521" defaultDatabase="ORCL" defaultUser="system" description="Oracle JDBC driver" custom="false">
+			<library type="jar" path="maven:/com.oracle.database.jdbc:ojdbc8:RELEASE" custom="false" disabled="true" version="12.2.0.1"/>
+			<library type="jar" path="maven:/com.oracle.database.nls:orai18n:RELEASE" custom="false" disabled="true" version="12.2.0.1"/>
+			<library type="jar" path="maven:/com.oracle.database.xml:xdb6:RELEASE" custom="false" disabled="true" version="12.2.0.1"/>
+			<library type="jar" path="maven:/com.oracle.database.xml:xmlparserv2:RELEASE" custom="false" disabled="true" version="12.2.0.1"/>
+			<library type="jar" path="C:\oraclexe\app\oracle\product\11.2.0\server\jdbc\lib\ojdbc6.jar" custom="true"/>
+		</driver>
+	</provider>
+</drivers>

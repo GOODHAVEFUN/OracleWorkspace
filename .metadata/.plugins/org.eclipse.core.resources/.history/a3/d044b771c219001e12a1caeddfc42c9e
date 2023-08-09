@@ -1,0 +1,76 @@
+
+--DDL => 테이블
+--	CREATE DROP ALTER TRUNCATE
+--DML => 데이터 조작
+--	INSERT UPDATE DELETE SELECT
+--TCL => 트랜잭션 제어
+--	COMMIT ROLLBACK
+--DCL => 사용 권한
+--	GRANT REVOKE
+
+--함수
+--	기능이다
+--
+--집계함수
+--	평균	AVG()
+	SELECT AVG(HEIGHT) FROM PLAYER;
+--	최대값	MAX()
+	SELECT MAX(HEIGHT) FROM PLAYER;
+--	최소값	MIN()
+	SELECT MIN(HEIGHT) FROM PLAYER p;
+--	총합	SUM()
+	SELECT SUM(HEIGHT) FROM PLAYER;
+--	개수	COUNT()
+	SELECT COUNT(NICKNAME) FROM PLAYER;
+--널값도 포함시키고 싶다면 
+	SELECT COUNT(NVL(NICKNAME,0)) FROM PLAYER;
+--	조회시 NULL 값을 다른 값으로 변경
+--	NVL(칼럼명, '값') : NULL값 대신 다른값으로 변경 후 조회
+--	NVL2(칼럼명,'NULL이 아닐 때 값','NULL일 떄 값') : NULL값 대신 다른값으로 변경 후 조회
+	SELECT NVL(NICKNAME,'별명없음') FROM PLAYER;
+	SELECT NVL2(NICKNAME,'있음','별명없음') FROM PLAYER;
+
+/* ORDER BY */
+SELECT * FROM PLAYER p 
+ORDER BY HEIGHT ;
+
+SELECT * FROM PLAYER
+WHERE NATION  IS NOT NULL
+ORDER BY HEIGHT DESC;
+--조건 HEIGHT기준  NOT NULL
+--내림차순정렬
+--NOT NULL : NULL을 허용하지 않는다
+
+/* GROUP BY : ~별(예 : 포지션 별 평균키)
+ * GROUP BY 컬럼명 HAVING 조건식
+ * WHERE절은 집계함수 사용이 불가능하지만 HAVING은 가능하다
+ * WHERE절에 우선적으로 처리할 조건식을 작성해야 속도가 빠른다
+ * 
+ * */
+
+-- PLAYER 테이블에서 포지션 종류 검색
+SELECT DISTINCT POSITION FROM PLAYER p 
+WHERE "POSITION" IS NOT NULL;
+
+-- GROUP BY로 포지션 종류를 보게되면 오류가 발생
+--SELECT * FROM PLAYER
+--GROUP BY "POSITION";
+
+-- 포지션을 GROUP BY로 묶어준다면 묶어주는 포지션 컬럼을 조회한다
+-- 반드시 조회해야하는 것은 아니지만 무엇을 기준으로 그룹을 지었는지 알기 쉽다
+SELECT POSITION FROM PLAYER p 
+GROUP BY "POSITION" ;
+
+-- 포지션 별 평균키 구하기
+SELECT AVG(HEIGHT) FROM PLAYER p 
+GROUP BY "POSITION" ;
+
+-- PLAYER  테이블에서 몸무게가 80이상인 선수들의 평균키가 180 초과인 포지션 검색(조회)
+SELECT POSITION FROM PLAYER p 
+WHERE WEIGHT > 80 
+GROUP BY "POSITION" 
+HAVING BY AVG(HEIGHT ) > 180;
+
+
+
+-- 결과확인

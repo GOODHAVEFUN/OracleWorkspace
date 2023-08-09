@@ -1,0 +1,40 @@
+/**
+ * 전체 학생들의 이름과 평균점수를 조회하기
+ * 
+ * 1. 학생테이블의 모든 데이터 조회하기
+ * 2. 전체 학생들의 이름과 평균점수를 조회하기
+ */
+
+SELECT * FROM TBL_STUDENT;
+
+SELECT STUDENT_NAME 이름,
+(STUDENT_MATH+STUDENT_ENG+STUDENT_KOR) /3 평균점수
+FROM TBL_STUDENT;
+
+INSERT INTO TBL_STUDENT 
+VALUES(1,'김철수', 90,92,88,null);
+INSERT INTO TBL_STUDENT 
+VALUES(2,'이상훈', 60,72,82,null);
+INSERT INTO TBL_STUDENT 
+VALUES(3,'김철수', 69,95,42,null);
+INSERT INTO TBL_STUDENT 
+VALUES(4,'김철수', 86,24,82,null);
+INSERT INTO TBL_STUDENT 
+VALUES(5,'김철수', 94,60,80,null);
+
+-- 특정 조건에 따라 테이블의 열 값을 가져와 계산하는 것
+UPDATE  TBL_STUDENT 
+SET  STUDENT_GRADE = (STUDENT_MATH+STUDENT_ENG+STUDENT_KOR) /3
+WHERE STUDENT_NAME ='김철수';
+
+SELECT * FROM TBL_STUDENT ;
+
+/*[실습] 학생의 평균점수를 구하고 학점을 수정하기
+ * A :90이상
+ * B :80이상 90점 미만
+ * C :50이상 80점 미만
+ * F :50점 미만
+ */
+UPDATE TBL_STUDENT 
+SET 'A' = IF (((STUDENT_MATH+STUDENT_ENG+STUDENT_KOR) /3)>= 90 )
+

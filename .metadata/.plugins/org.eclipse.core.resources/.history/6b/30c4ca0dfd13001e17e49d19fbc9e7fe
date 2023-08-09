@@ -1,0 +1,7 @@
+--회사에 존재하는 직급(job_id) 조회하기
+SELECT JOB_ID 
+FROM EMPLOYEES;
+--107개 의 결과가 나온다, 어떤 종류가 존재하는지 알고싶기에 중복을 제외 시킨다
+--DISTINCT  : 해당칼럼에서 중복되는 값을 제외 시킨다
+SELECT DISTINCT JOB_ID
+FROM EMPLOYEES;

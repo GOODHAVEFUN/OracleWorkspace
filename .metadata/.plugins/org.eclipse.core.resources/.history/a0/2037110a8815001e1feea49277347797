@@ -1,0 +1,7 @@
+CREATE TABLE TBL_USER(
+	user_name varchar2(1000),
+	user_age number
+);
+
+--테이블명 수정
+ALTER TABLE TBL_USER RENAME TO TBL_MY_USER;

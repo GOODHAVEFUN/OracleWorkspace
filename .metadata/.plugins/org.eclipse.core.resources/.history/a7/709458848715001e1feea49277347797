@@ -1,0 +1,4 @@
+CREATE TABLE TBL_USER(
+	user_name varchar2(1000),
+	user_age number
+);

@@ -1,0 +1,52 @@
+--자료형 
+--	char ,varchar2, number, date
+	
+--연산자
+--	연결연산자 a||b
+SELECT
+	FIRST_NAME || LAST_NAME
+FROM
+	EMPLOYEES;
+--연결연산 결과 값은 항상 varchar2로 출력
+SELECT
+	FIRST_NAME || EMPLOYEE_ID || EMAIL || HIRE_DATE
+FROM
+	EMPLOYEES;
+--결과값 Steven100SKING03/06/17
+--위처럼 무엇이든 문자로 변환되어 출력한다
+
+--[실습] 사원의 이름과 메일주소 출력하기
+-- 이 때 이름은 first_name과 last_name이 띄어쓰기로 이어져있고
+-- 메일의 주소는 사원메일주소@koreait.com이다
+SELECT
+	FIRST_NAME || ' ' || LAST_NAME 이름 ,
+	EMAIL || '@koreait.com' e메일
+FROM
+	EMPLOYEES;
+
+--산술연산자 +-*/
+-- [실습] 직원의 이름, 봉급, 인상봉급, 감축봉급을 조회하기
+-- 이름은 성과 함께 띄어쓰기로 연결되어있다
+-- 인상봉급은 기존봉급의 10% 증가되었고 -> 1.1
+-- 감축봉급은 기존봉급의 10% 감소되었다 -> 0.9
+-- 결과를 기존 봉급 오름차순으로 정렬하여 조회한다
+SELECT
+	FIRST_NAME || LAST_NAME 이름,
+	SALARY 봉급,
+	SALARY * 1.1 인상봉급,
+	SALARY * 0.9 감축봉급
+FROM
+	EMPLOYEES
+ORDER BY
+	SALARY ASC;
+--날짜 타입도 연산가능하다 
+--날짜 숫자 연산
+SELECT
+	SYSDATE  현재시각,
+	SYSDATE -1 마이너스1,
+	SYSDATE +1 플러스1,
+	SYSDATE -HIER_date,
+	SYSDATE +1 플러스1
+FROM 
+EMPLOYEES;
+--sysdate 현재date

@@ -1,0 +1,16 @@
+-- 조인을 사용할때는 테이블간 관계를 항상확인해야한다
+SELECT  * FROM TBL_DEPT td; 
+SELECT  * FROM TBL_EMP te; 
+
+--DROP 
+--ALTER  
+--TRUNCATE 
+
+-- ERD확인 하기
+-- 두 테이블간 관계에서 DEPT_NO 를 FK로 사용 하고 있으므로
+-- DEPT_NO  를 비교하여 등가 조인을 사용할수있다
+
+INSERT INTO TBL_EMP VALUES (1004, '맹구', '개발부', 3000, SYSDATE, 2500, 20);
+
+DELETE TBL_EMP
+WHERE EMP_NAME = '맹구';

@@ -1,0 +1,433 @@
+
+--DDL => 테이블
+--	CREATE DROP ALTER TRUNCATE
+--DML => 데이터 조작
+--	INSERT UPDATE DELETE SELECT
+--TCL => 트랜잭션 제어
+--	COMMIT ROLLBACK
+--DCL => 사용 권한
+--	GRANT REVOKE
+
+--함수
+--	기능이다
+--
+--집계함수
+--	평균	AVG()
+	SELECT AVG(HEIGHT) FROM PLAYER;
+--	최대값	MAX()
+	SELECT MAX(HEIGHT) FROM PLAYER;
+--	최소값	MIN()
+	SELECT MIN(HEIGHT) FROM PLAYER p;
+--	총합	SUM()
+	SELECT SUM(HEIGHT) FROM PLAYER;
+--	개수	COUNT()
+	SELECT COUNT(NICKNAME) FROM PLAYER;
+--널값도 포함시키고 싶다면 
+	SELECT COUNT(NVL(NICKNAME,0)) FROM PLAYER;
+--	조회시 NULL 값을 다른 값으로 변경
+--	NVL(칼럼명, '값') : NULL값 대신 다른값으로 변경 후 조회
+--	NVL2(칼럼명,'NULL이 아닐 때 값','NULL일 떄 값') : NULL값 대신 다른값으로 변경 후 조회
+	SELECT NVL(NICKNAME,'별명없음') FROM PLAYER;
+	SELECT NVL2(NICKNAME,'있음','별명없음') FROM PLAYER;
+
+/* ORDER BY */
+SELECT * FROM PLAYER p 
+ORDER BY HEIGHT ;
+
+SELECT * FROM PLAYER
+WHERE NATION  IS NOT NULL
+ORDER BY HEIGHT DESC;
+--조건 HEIGHT기준  NOT NULL
+--내림차순정렬
+--NOT NULL : NULL을 허용하지 않는다
+
+/* GROUP BY : ~별(예 : 포지션 별 평균키)
+ * GROUP BY 컬럼명 HAVING 조건식
+ * WHERE절은 집계함수 사용이 불가능하지만 HAVING은 가능하다
+ * WHERE절에 우선적으로 처리할 조건식을 작성해야 속도가 빠른다
+ * 
+ * */
+
+
+--GROUP BY, HAVING 절
+--	GROUP BY 절은 특정 컬럼에 있는 값을 그룹으로 묶어서 데이터를 집계한다
+--	ORDER BY와 동일하게 SELECT문에서 사용하며 위치는 WHERE 절 다음, ORDER BY절 이전에 작성한다
+--	HAVING 절은 GROUP BY 다음에 사용할 수 있으며 
+--	SELECT의 WHERE절처럼 GROUP BY의 HAVING도 조건을 걸어준다
+--	WHERE절은 쿼리 전체에 조건을 걸어 데이터 가져오며
+--	그 데이터들을 GROUP BY로 묶어 주는데 묶은 데이터에 조건이 필요하다면 HAVING절에 작성하면된다
+--	최종 결과가 나오면 ORDER BY로 정렬한다
+
+-- PLAYER 테이블에서 포지션 종류 검색
+SELECT DISTINCT POSITION FROM PLAYER p 
+WHERE "POSITION" IS NOT NULL;
+
+-- GROUP BY로 포지션 종류를 보게되면 오류가 발생
+--SELECT * FROM PLAYER
+--GROUP BY "POSITION";
+
+-- 포지션을 GROUP BY로 묶어준다면 묶어주는 포지션 컬럼을 조회한다
+-- 반드시 조회해야하는 것은 아니지만 무엇을 기준으로 그룹을 지었는지 알기 쉽다
+SELECT POSITION FROM PLAYER p 
+GROUP BY "POSITION" ;
+
+-- 포지션 별 평균키 구하기
+SELECT AVG(HEIGHT) FROM PLAYER p 
+GROUP BY "POSITION" ;
+
+-- PLAYER  테이블에서 몸무게가 80이상인 선수들의 평균키가 180 초과인 포지션 검색(조회)
+SELECT POSITION FROM PLAYER p 
+WHERE WEIGHT > 80 
+GROUP BY "POSITION" 
+HAVING AVG(HEIGHT ) > 180;
+
+
+-- 결과확인
+SELECT "POSITION" , MIN(WEIGHT) , AVG(HEIGHT)  FROM PLAYER p 
+WHERE  WEIGHT > 80
+GROUP BY "POSITION" 
+HAVING  AVG(HEIGHT) > 180; 
+
+-- EMPLOYEES 테이블에서 JOB_ID별 평균 SALARY가 10000미만인 JOB_ID 검색
+-- JOB_ID는 알파벳 순으로 정렬(오름차순)
+SELECT JOB_ID ,AVG(SALARY)평균 ,MIN(SALARY) ,MAX(SALARY) 
+FROM EMPLOYEES e
+GROUP BY JOB_ID 
+HAVING AVG(SALARY) <10000 
+ORDER BY JOB_ID ;
+
+
+
+-- [실습] PLAYER 테이블
+-- 1. PLAYER_ID가 2007로 시작하는 선수들 중 POSITION별 평균 키를 조회
+SELECT
+	COUNT(PLAYER_ID),
+	MIN(HEIGHT),
+	AVG(HEIGHT),
+	MAX(HEIGHT)
+FROM
+	PLAYER p
+WHERE
+	PLAYER_ID LIKE '2007%'
+GROUP BY
+	"POSITION" ;
+-- +) PLAYER 테이블에서 POSITION이 DF인것만 조회 2번문제와는 다름
+SELECT  * FROM PLAYER p 
+WHERE "POSITION" ='DF' ;
+
+
+
+-- 2. 선수들 중 포지션이 DF 선수들의 평균키를 TEAM_ID 별로 조회하고 평균 키 오름차순으로 정렬하기
+SELECT TEAM_ID  ,AVG(HEIGHT) FROM PLAYER 
+WHERE "POSITION" ='DF'
+GROUP BY TEAM_ID
+ORDER BY AVG(HEIGHT) ;
+
+
+
+-- 3. 포지션이 MF인 선수들의 입단연도 별 평균 몸무게, 평균 키를 구한다 컬럼명은 입단연도, 평균 몸무게, 평균 키로 표시한다
+--    입단연도를 오름차순으로 정렬
+SELECT JOIN_YYYY , AVG(WEIGHT) "평균 몸무게", AVG(HEIGHT) "평균 키"  FROM PLAYER
+WHERE "POSITION" = 'MF'
+GROUP BY JOIN_YYYY 
+ORDER BY JOIN_YYYY;
+--컬럼명 [AS "별칭"],
+
+
+
+-- EMPLOYEE 테이블
+-- 1. 핸드폰 번호가 515로 시작하는 사원들의 JOB_ID별 SALARY 평균을 구한다
+--    조회 컬럼은 부서, 평균 급여로 표시한다
+--    평균 급여가 높은 순으로 정렬한다
+SELECT JOB_ID 부서,COUNT(JOB_ID), AVG(SALARY) "평균 급여"  
+FROM EMPLOYEES e 
+WHERE  PHONE_NUMBER LIKE '515%'
+GROUP BY JOB_ID 
+ORDER BY"평균 급여"  DESC; 
+
+
+-- 2. COMMISSION_PCT 별 평균 급여를 조회한다
+--    COMMISSION_PCT를 오름차순으로 정렬하며 HAVING 절을 사용하여 NULL은 제외한다
+SELECT COMMISSION_PCT,AVG(SALARY) 
+FROM EMPLOYEES e 
+GROUP BY COMMISSION_PCT
+HAVING COMMISSION_PCT IS NOT NULL 
+ORDER BY COMMISSION_PCT;
+
+--SQL 실행순서
+--	FROM > WHERE > GROUP BY > HAVING > SELECT > ORDER BY 중요!
+
+
+-- 서브쿼리
+--SUB 쿼리
+--	하나의 쿼리 내에 작성하는 또 다른 쿼리
+--	서브 쿼리의 위치에 따른 종류
+--		1. FROM 절 : IN LINE VIEW
+--		2. SELECT 절 : SCALAR
+--		3. WHERE 절 :  SUB QUERY
+--		일반적으로 전부 서브쿼리라고 부른다
+
+-- PLAYER 테이블에서 전체 평균 키와 포지션 별 평균 키 구하기
+SELECT AVG(HEIGHT)  
+FROM PLAYER p ;
+
+SELECT
+	AVG(HEIGHT),
+	(
+	SELECT
+		AVG(HEIGHT)
+	FROM
+		PLAYER p )
+FROM
+	PLAYER p
+GROUP BY
+	"POSITION" ;
+
+-- 그룹으로 묶은 행의 수보다 적은 행을 같이 조회하는 것은 가능하다
+-- 그러나 그룹으로 묶은 행의 수보다 많은 행을 같이 조회하는 것은 불가능하다
+
+-- 오류 발생 서브쿼리의 행의 수가 메인 쿼리보다 많음
+--SELECT "POSITION", AVG(HEIGHT), (SELECT * FROM PLAYER)
+--FROM PLAYER
+--WHERE "POSITION" IS NOT NULL
+--GROUP BY "POSITION";
+--SQL Error [900] [42000]: ORA-00900: invalid SQL statement
+
+-- PLAYER 테이블에서 TEAM_ID가 'K01'인 선수 중 POSITION이 'GK'인 선수 조회하기(SBU쿼리 사용하기)
+SELECT *  FROM PLAYER p
+WHERE TEAM_ID = 'K01';
+
+SELECT * FROM PLAYER p 
+WHERE "POSITION" = 'GK' AND TEAM_ID = 'K01';
+
+SELECT
+	*
+FROM
+	(
+	SELECT
+		*
+	FROM
+		PLAYER p
+	WHERE
+		TEAM_ID = 'K01')
+WHERE
+	"POSITION" = 'GK';
+
+-- 조건에 서브쿼리 사용
+-- PLAYER 테이블에서 평균 몸무게보다 더 많이 나가는 선수들 검색
+SELECT AVG(WEIGHT) FROM PLAYER p ; 
+
+SELECT  *  FROM PLAYER p 
+WHERE WEIGHT > (SELECT AVG(WEIGHT) FROM PLAYER p ) 
+ORDER BY WEIGHT ; 
+
+
+-- 결과 맞는지 확인
+-- 평균 몸무게보다 큰 몸무게 중 가장 작은 값 조회
+SELECT  MIN(WEIGHT)  FROM PLAYER p 
+WHERE WEIGHT > (SELECT AVG(WEIGHT) FROM PLAYER p )  
+ORDER BY WEIGHT ;
+
+-- [실습]
+-- 1. PLAYER 테이블에서 정남일 선수가 소속된 팀의 선수들 조회
+SELECT TEAM_ID 
+FROM PLAYER p 
+WHERE PLAYER_NAME = '정남일';
+
+SELECT
+	*
+FROM
+	PLAYER p
+WHERE
+	TEAM_ID = (
+	SELECT
+		TEAM_ID
+	FROM
+		PLAYER p
+	WHERE
+		PLAYER_NAME = '정남일');
+-- 주 쿼리 해당 팀과 일치하는 선수들 선택
+-- 서브쿼리 정남일 선수의 소속팀의 ID를 가져옴
+
+-- 2. PLAYER 테이블에서 평균 키보다 작은 선수 조회
+SELECT AVG(HEIGHT) 
+FROM PLAYER p ;
+
+SELECT
+	*
+FROM
+	PLAYER p
+WHERE
+	HEIGHT < (
+	SELECT
+		AVG(HEIGHT)
+	FROM
+		PLAYER p);	
+-- 서브쿼리 평균키 계산
+-- 메인쿼리 해당 평균키보다 작은 선수들을 선택
+
+--확인
+SELECT
+	MAX(HEIGHT)
+FROM
+	PLAYER p
+WHERE
+	HEIGHT <(
+	SELECT
+		AVG(HEIGHT)
+	FROM
+		PLAYER p);
+
+
+-- 3. SCHEDULE 테이블에서 경기 일정이 20120501~20120502 사이에 있는 경기장 전체 정보 조회
+SELECT STADIUM_ID  FROM SCHEDULE s WHERE SCHE_DATE  BETWEEN  20120501 AND 20120502;
+-- 문자 비교로 결과가 잘 나오는 지 확인
+
+-- STADIUM_ID와 비교하는 대상이 여러개다
+-- STADIUM_ID = 000 OR STADIUM_ID = 001  OR ,....
+-- OR 연산자로 작성하는게 불가능하다
+-- IN 연산자를 사용한다
+SELECT * FROM STADIUM s 
+WHERE STADIUM_ID IN (SELECT STADIUM_ID  FROM SCHEDULE s WHERE SCHE_DATE  BETWEEN  20120501 AND 20120502);
+-- 서브쿼리로 조회한 것 : SCHEDULE 테이블에서 SCHE_DATE가 20120501부터 20120502사이에 있는 경기 일정을
+-- STADIUM_ID를 서브쿼리로 조회
+-- 주(메인)쿼리 : IN연산자를 사용해서 STADIUM 테이블에서 해당 STADIUM_ID를 가진 모든 컬럼 조회
+
+-- TCL 버튼을 클릭하여 매뉴얼 커밋으로 변경하고 아래 실습 후 반드시 ROLLBACK 하기
+
+-- 4. PLAYER 테이블에서 NICKNAME이 NULL인 선수들을 정태민 선수의 닉네임으로 바꾸기
+SELECT NICKNAME FROM PLAYER p WHERE PLAYER_NAME = '정태민';
+
+UPDATE PLAYER 
+SET NICKNAME = (SELECT NICKNAME FROM PLAYER p WHERE PLAYER_NAME = '정태민')
+WHERE NICKNAME IS NULL
+
+SELECT NICKNAME FROM PLAYER p 
+-- 서브쿼리 : 정태민 선수의 닉네임 가져옴
+-- 주(메인)쿼리 : NULL 인 선수들에게 해당 닉네임 지정
+
+-- 5. EMPLOYEES 테이블에서 평균 급여보다 낮은 사원들의 급여를 20% 인상
+-- 평균급여
+SELECT AVG(SALARY) FROM EMPLOYEES e ;
+
+UPDATE EMPLOYEES 
+SET SALARY = SALARY * 1.2
+WHERE SALARY < (SELECT AVG(SALARY) FROM EMPLOYEES e);
+-- 최저급여
+SELECT MIN(SALARY) FROM EMPLOYEES e ;
+
+SELECT * FROM EMPLOYEES e ;
+
+-- 6. PLAYER 테이블에서 평균 키보다 큰 선수들을 삭제
+SELECT AVG(HEIGHT) FROM PLAYER p;  
+
+DELETE PLAYER p
+WHERE HEIGHT >(SELECT AVG(HEIGHT) FROM PLAYER p)
+
+
+/*
+ * ROWNUM
+ * ROWNUM
+ * 결과 행 앞에 1부터 1씩 증가하는 시퀀스를 붙여준다
+ * 
+ * 그냥 컬럼처럼 사용하면 된다
+ * *을 다른 컬럼과 함께 조회하게 되면 소속을 명시해줘야한다
+ * 그러므로 테이블에 ALIAS를 부여하고 해당 별칭을 *에 명시해준다
+ * 
+ */
+
+-- EMPLOYESS 테이블에서 SALARY를 내림차순으로 정렬한 후
+-- ROWNUM을 붙여서 조회한다
+SELECT ROWNUM, E.* FROM EMPLOYEES E;
+
+SELECT ROWNUM, FIRST_NAME FROM EMPLOYEES;
+
+
+-- SELECT 절에  ROWNUM을 사용하였다 ORDER BY절보다 SELECT절이 먼저 실행된다
+-- 즉, ROWNUM은 ORDER BY 이전에 부여되기 때문에 원하는 결과가 나오지 않는다
+SELECT ROWNUM, E.* FROM EMPLOYEES E
+ORDER BY SALARY DESC;
+
+SELECT ROWNUM, E2.*
+FROM ( 
+   SELECT * FROM EMPLOYEES e
+   ORDER BY SALARY DESC
+) E2;
+-- EMPLOYEES 테이블의 데이터를 서브쿼를 사용하여 SALARY를 기준으로 내림차순 정렬한 뒤
+-- 메인쿼리에서 이 결과에 ROWNUM값을 추가하여 조회
+
+/* JOIN */
+-- EMP 테이블에서 사원 번호로 DEPT 테이블의 지역 검색
+-- 조인을 사용할 때 테이블 간의 관계를 먼저 확인해야한다A
+SELECT * FROM EMP e;
+
+CREATE TABLE TBL_EMP(
+   EMP_NO NUMBER PRIMARY KEY,
+   EMP_NAME VARCHAR2(20),
+   EMP_JOB VARCHAR2(20),
+   EMP_MGR NUMBER,
+   EMP_HIREDATE DATE,
+   EMP_SAL NUMBER,
+   DEPT_NO NUMBER
+)
+
+
+CREATE TABLE TBL_DEPT( 
+   DEPT_NO NUMBER PRIMARY KEY,
+   DEPT_NAME VARCHAR2(30),
+   DEPT_LOC VARCHAR2(30)
+)
+
+ALTER TABLE TBL_EMP ADD CONSTRAINT FK_EMP_DEPT FOREIGN KEY (DEPT_NO) REFERENCES TBL_DEPT(DEPT_NO);
+
+DROP TABLE TBL_DEPT;
+DROP TABLE TBL_EMP;
+
+SELECT * FROM TBL_EMP;
+SELECT * FROM TBL_DEPT;
+
+INSERT INTO TBL_DEPT VALUES(10, 'A', '서울');
+INSERT INTO TBL_DEPT VALUES(20, 'B', '경기');
+INSERT INTO TBL_DEPT VALUES(30, 'C', '부산');
+
+INSERT INTO TBL_EMP VALUES (1001, '짱구', '개발부', 1000, SYSDATE, 2000, 10);
+INSERT INTO TBL_EMP VALUES (1002, '유리', '개발부', 2000, SYSDATE, 2000, 20);
+INSERT INTO TBL_EMP VALUES (1003, '철수', '개발부', 1000, SYSDATE, 2000, 30);
+
+
+SELECT E.EMP_NAME, D.DEPT_LOC
+FROM TBL_EMP E
+JOIN TBL_DEPT D ON E.DEPT_NO = D.DEPT_NO;
+
+--JOIN
+--	여러 테이블에 흩어져있는 정보 중
+--	사용자가 필요한 정보만 가져와서 가상의 테이블처럼 만들고 결과를 보여주는 것
+--	
+--	정규화를 통해 조회 테이블이 너무 많이 쪼개져 있으면 작업이 불편하기 때문에
+--	입력, 수정, 삭제의 성능을 향상시키기 위해서 JOIN을 통해 합친 후 사용한다
+--
+--내부조인(INNER JOIN)
+--	조건이 정확히 일치하는 값만 합쳐서 조회
+--	
+--	FROM 테이블명A INNER JOIN 테이블명B
+--	ON 조건
+--
+--	A테이블의 col 컬럼과 B테이블의 col이라는 컬럼을
+--	조건으로 비교하여 참일 경우 가상테이블에 합쳐져서 추가된다
+--	a와 a를 비교하면 같다라는 조건이 성립되므로 참이 된다
+--	그러므로 가상의 테이블에 추가되고 나머지 컬럼과 비교하면 거짓이다
+--	b를 다시 B테이블의 값과 비교하여 성립되는 행과 합쳐져 추가된다
+--
+--등가조인
+--	ON절 등호(=)가 있을 때
+--	두 테이블 간의 관계가 있다면(FK가 존재한다면) 부모 테이블의 PK와 자식 테이블의 FK를
+--	등호로 비교가 가능하기 때문에 등가조인 사용이 가능하다
+--
+--비등가조인
+--	ON절에 등호(=)가 없을 때
+--
+--SQL의 실행순서
+--	FROM > ON > JOIN > WHERE > GROUP BY > HAVING > SELECT > ORDER BY
+--
+--	ON절의 조건은 JOIN이 되면서 실행되고, WHERE 절의 조건은 JOIN이 모두 끝나고 나서 실행된다
+--	ON과 WHERE를 같이 사용할 때와 ON만 사용할 때의 결과가 같다면 ON만 사용하는 것이 좋다

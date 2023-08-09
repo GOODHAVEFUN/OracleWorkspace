@@ -1,0 +1,8 @@
+
+-- 한줄 주석 : 컴퓨터가 해석하지않는다
+-- 실행시키지 않고 설명을 작성할때 사용한다
+
+-- SELECT 를 사용하여 
+SELECT first_name FROM employees;
+SELECT first_name FROM hr.employees;
+

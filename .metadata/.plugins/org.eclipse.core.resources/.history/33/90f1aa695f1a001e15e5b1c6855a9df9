@@ -1,0 +1,237 @@
+--GROUP BY, HAVING
+--	GROUP BY 절은 특정 컬럼에 있는 값을 그룹으로 묶어서 데이터 집계
+--	SELETE WHERE GROUP BY ORDER BY
+--
+--SQL 실행순서
+--	FROM > ON > JOIN > WHERE > GROUP BY > HAVING > SELECT > ORDER BY
+--
+--서브쿼리
+--	SQL 쿼리문 안에 포함된 또 다른 쿼리문
+--	FROM
+--	SELECT
+--	WHERE
+
+--JOIN
+--	여러 테이블에 흩어져 있는 정보 중 사용자가 필요한 정보만 가져와서
+--	가상 테이블을 만들고 결과를 보여주는것
+--
+--	정규화 진행하면 조회 테이블이 많이 쪼개져 있으면 작업이 불편하기 때문에
+--	입력, 수정, 삭제의 성능을 향상시키기 위해 JOIN 합친 후 작업한다
+--
+--내부조인
+--	조건이 정확히 일치하는 값만 합쳐서 조회
+--	
+--등가조인
+--	ON절에 = 등호가 있을 때
+--
+--비등가조인
+--	ON절에 등호가 없을 때
+--
+--자기조인(Self Join)
+--	하나의 테이블 내에서 자기 자신을 조인하는 것을 의미한다
+--	테이블 내에 있는 관계를 찾거나 계층구조를 처리할 때 사용된다
+--	계층구조 : 자기조인을 사용하여 상위와 하위요소를 연결할 수 있다
+--	관계확인 : 테이블 내에 있는 관계를 확인하기 위해 자기조인을 사용할 수 있다
+--
+--	select E1.employee_name, E2.employee_name
+--	from employees E1
+--	join employees E2 on e1.manager_id = e2.manager_id
+
+-- 조인을 사용할 때는 테이블간 관계를 먼저 확인해야한다
+-- EMP 테이블에서 사원번호로 DEPT 테이블의 지역 검색
+SELECT * FROM tbl_dept;
+SELECT * FROM tbl_emp;
+
+INSERT INTO TBL_EMP VALUES (1004, '맹구', '개발부', 3000, SYSDATE, 2500, 20);
+
+-- ERD 확인하기
+-- 두 테이블간 관계에서 DEPT_NO를 FK로 사용하고 있으므로
+-- DEPT_NO를 비교하여 등가조인을 사용할 수 있다
+
+-- DEPT 테이블의 행이 적은데 DEPT 후행 테이블로 왔다 효율이 좋지 않다
+-- 별칭을 반드시 줘야 ON 절에서 구분이 가능하다
+SELECT *
+FROM TBL_EMP E
+JOIN TBL_DEPT D
+ON E.DEPT_NO = D.DEPT_NO;
+
+SELECT * 
+FROM TBL_DEPT D 
+JOIN TBL_EMP E
+ON D.DEPT_NO = E.DEPT_NO;
+
+-- 지역을 검색하라고 했으니 JOIN에서 나온 결과의 가상테이블에서
+-- 내가 원하는 정보만 뽑아온다
+SELECT E.EMP_NAME, DEPT_LOC
+FROM TBL_DEPT D 
+JOIN TBL_EMP E
+ON D.DEPT_NO = E.DEPT_NO;
+
+
+-- [실습]
+-- 1. PLAYER 테이블에서 송종국 선수가 속한 TEAM의 전화번호 검색하기
+-- 테이블 데이터와 관계확인
+SELECT  * FROM PLAYER p; 
+SELECT * FROM TEAM t ;
+-- 일단 합치기
+SELECT * FROM TEAM t 
+JOIN PLAYER p ON t.TEAM_ID = p.TEAM_ID ;
+
+SELECT * 
+FROM TEAM t 
+JOIN PLAYER p 
+ON t.TEAM_ID = p.TEAM_ID 
+WHERE p.PLAYER_NAME = '송종국'
+
+SELECT t.TEL  
+FROM TEAM t 
+JOIN PLAYER p 
+ON t.TEAM_ID = p.TEAM_ID 
+WHERE p.PLAYER_NAME = '송종국'
+-- 효율적인지 생각하기
+-- WHERE를 안쓸 수 있다면 안쓰고 ON만 사용하는것이 좋다
+
+SELECT T.TEAM_NAME ,t.TEL  
+FROM TEAM t 
+JOIN PLAYER p 
+ON t.TEAM_ID = p.TEAM_ID 
+WHERE p.PLAYER_NAME = '송종국'
+-- 팀이름 같이 뽑으면 좋을 것이다
+
+--SELECT TEAM_ID , T.TEAM_NAME ,t.TEL  FROM TEAM t 
+--JOIN PLAYER p ON t.TEAM_ID = p.TEAM_ID 
+--WHERE p.PLAYER_NAME = '송종국'
+-- 팀아이디를 SELECT로 가져오려고 하면 오류가 난다
+--SQL Error [918] [42000]: ORA-00918: column ambiguously defined
+
+SELECT P.TEAM_ID , T.TEAM_NAME , t.TEL  
+FROM TEAM t 
+JOIN PLAYER p 
+ON t.TEAM_ID = p.TEAM_ID 
+WHERE p.PLAYER_NAME = '송종국'
+-- 양쪽 테이블 모두 TEMA_ID가 존재하기 때문에 어느 테이블의 TEAM_ID인지 컴퓨터는 알수가 없다
+-- 그러므로 어느 테이블의 TEAM_ID인지 알려줘야한다 (P.TEAM_ID, T.TEAM_ID)
+
+-- 2. JOBS 테이블에서 JOB_ID로 직원들의 JOB_TITLE, EMAIL, 성, 이름 조회
+SELECT COUNT(*) FROM JOBS j ; 
+SELECT * FROM JOBS j ; 
+SELECT COUNT(*) FROM EMPLOYEES e  ;
+SELECT * FROM EMPLOYEES e  ;
+-- 행 개수 확인
+
+SELECT JOB_TITLE , EMAIL , LAST_NAME , FIRST_NAME 
+FROM JOBS j 
+JOIN  EMPLOYEES e ON E.JOB_ID = J.JOB_ID ;
+
+-- 3. EMPLOYEES 테이블에서 HIREDATE가 2001~2003년까지인 사원의 정보와 부서명 검색
+SELECT * FROM EMPLOYEES e  ;
+SELECT * FROM DEPARTMENTS d ;
+
+SELECT E.*,D.DEPARTMENT_NAME 
+FROM DEPARTMENTS d 
+JOIN EMPLOYEES e ON D.DEPARTMENT_ID = E.DEPARTMENT_ID 
+WHERE  E.HIRE_DATE BETWEEN '2001-01-01' AND '2003-12-31';
+-- BETWEEN 주어진 범위 내에 있는 값을 선택할 때 사용함
+-- 비교할 열의 이름 BETWEEN 앞에 비교할 범위의 시작과 끝값을 사용한다
+
+
+-- 1. 축구 선수들 중에서 각 팀별로 키가 가장 큰 선수들의 전체 정보 조회
+
+-- 위 문제를 JOIN 없이 풀기
+-- (A, B) IN (C, D) : A = C AND B = D
+SELECT TEAM_ID  , MAX(HEIGHT) FROM PLAYER p 
+GROUP BY TEAM_ID ;
+-- 우선 팀별로 그룹화하고 가장 큰 키를 찾는다
+
+SELECT * FROM PLAYER p 
+WHERE (TEAM_ID , HEIGHT)  IN (SELECT TEAM_ID  , MAX(HEIGHT) FROM PLAYER p
+GROUP BY TEAM_ID )
+ORDER BY TEAM_ID 
+-- 두 컬럼 조회되므로
+-- (a, b) in (c, d) : a = c and b = d를 이용해서 두 컬럼의 조건을 건다
+
+
+-- join 이용 과제
+SELECT P.TEAM_ID , MAX(P.HEIGHT)  FROM TEAM t
+JOIN PLAYER p  ON T.TEAM_ID =P.TEAM_ID  
+GROUP BY P.TEAM_ID
+ORDER BY TEAM_ID ;
+
+
+-- 자기조인 예제
+SELECT 
+	E.FIRST_NAME ,
+	E2.FIRST_NAME  
+FROM EMPLOYEES e 
+JOIN EMPLOYEES e2 
+ON E.EMPLOYEE_ID = E2.MANAGER_ID  
+ORDER BY E2.MANAGER_ID; 
+
+
+-- 2. EMPLOYEES 테이블의 각 사원의 이름, 매니저의 직무 조회
+SELECT 
+	M.FIRST_NAME ,
+	E.JOB_ID  
+FROM EMPLOYEES e 
+JOIN EMPLOYEES M 
+ON E.EMPLOYEE_ID =M.MANAGER_ID 
+
+-- 사원ID, 매니저ID 조회
+SELECT E.EMPLOYEE_ID  
+FROM EMPLOYEES e ;
+
+SELECT E.MANAGER_ID  
+FROM EMPLOYEES e ;
+
+-- 매니저의 ID 조인 매니저 ID와 직무(JOB_ID) 조회
+SELECT E.MANAGER_ID 
+FROM EMPLOYEES e 
+JOIN EMPLOYEES M 
+ON E.MANAGER_ID =M.MANAGER_ID ;
+
+-- 직무(JOB_ID) 조인하여 매니저 ID와 매니저의 직무(JOB_TITLE)를 조회
+SELECT J.JOB_TITLE  
+FROM EMPLOYEES e 
+JOIN JOBS j 
+ON E.JOB_ID  = J.JOB_ID;
+--JOIN JOBS J ON M.JOB_ID = J.JOB_ID;
+
+-- 각 사원 이름과 매니저 직무를 조회
+SELECT
+	E.FIRST_NAME || ' ' ||E.LAST_NAME ,
+	M.JOB_TITLE  
+FROM EMPLOYEES e 
+JOIN (
+	SELECT *  
+	FROM EMPLOYEES e 
+	JOIN JOBS j 
+	ON E.JOB_ID  = J.JOB_ID
+	) M 
+ON E.MANAGER_ID  = M.EMPLOYEE_ID;  
+
+-- 3. EMPLOYEES 테이블의 모든 사원의 이름과 부서명 조회
+SELECT 
+	E.FIRST_NAME || ' ' || E.LAST_NAME NAME , 
+	D.DEPARTMENT_NAME  
+FROM EMPLOYEES e 
+JOIN DEPARTMENTS d 
+ON E.DEPARTMENT_ID = D.DEPARTMENT_ID 
+
+-- 4. EMPLOYEES 테이블에서 매니저가 없는 사원의 이름과 직무 조회
+SELECT *
+FROM EMPLOYEES e 
+WHERE MANAGER_ID IS NULL;
+
+SELECT *
+FROM EMPLOYEES e 
+WHERE MANAGER_ID IS NULL;
+
+
+
+-- 5. EMPLOYEES 테이블에서 직무별 평균 급여 조회
+
+-- 6. EMPLOYEES 테이블에서 매니저별로 직속 직원 사원수 조회
+
+-- 매니저별 직원 수 조회 과제
+
+

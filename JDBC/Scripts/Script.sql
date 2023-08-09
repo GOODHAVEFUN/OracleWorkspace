@@ -1,0 +1,14 @@
+CREATE TABLE TBL_USER(
+	user_id NUMBER CONSTRAINT pk_user PRIMARY KEY,
+	USER_IDENTIFIcation varchar2(500) UNIQUE NOT NULL,
+	USER_password varchar2(500) NOT NULL,
+	USER_name varchar2(500) NOT NULL,
+	USER_phone varchar2(500) NOT NULL,
+	USER_nickname varchar2(500),
+	USER_email varchar2(500) NOT NULL ,
+	USER_ADDRESS varchar2(500) ,
+	USER_BIRTH DATE ,
+	USER_RECOMMENDER_ID VARCHAR2(500)
+);
+
+SELECT  * FROM TBL_USER;

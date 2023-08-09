@@ -1,0 +1,14 @@
+
+-- 한줄 주석 : 컴퓨터가 해석하지않는다
+-- 실행시키지 않고 설명을 작성할때 사용한다
+
+-- SELECT 를 사용하여 
+SELECT first_name FROM employees;
+SELECT first_name FROM hr.employees;
+-- .DBeaver가 알아서 예약어는 대문자로 바꿔 준다
+--(.)을 써줘야한다 .은 ~안에 있는  이라는 의미이다
+-- ;하나의 명령이 끝나면 작성한다
+-- 세미콜론 이전에 줄바꿈해도 상관없다
+
+SELECT FIRST_NAME , LAST_NAME  FROM HR.EMPLOYEES;
+--대문자로 작성해도 오류가 발생하지않는다

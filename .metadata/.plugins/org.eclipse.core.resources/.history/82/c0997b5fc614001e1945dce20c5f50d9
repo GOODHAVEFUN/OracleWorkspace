@@ -1,0 +1,4 @@
+CREATE TABLE TBL_MEMBER(
+	member_name varchar2(1000),
+	member_AGE NUMBER
+);

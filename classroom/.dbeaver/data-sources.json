@@ -1,0 +1,40 @@
+{
+	"folders": {},
+	"connections": {
+		"oracle_thin-188fff48295-1e59d20336071d5a": {
+			"provider": "oracle",
+			"driver": "oracle_thin",
+			"name": "localhost",
+			"save-password": true,
+			"configuration": {
+				"host": "localhost",
+				"port": "1521",
+				"database": "XE",
+				"url": "jdbc:oracle:thin:@//localhost:1521/XE",
+				"configurationType": "MANUAL",
+				"home": "C:\\oraclexe\\app\\oracle\\product\\11.2.0\\server",
+				"type": "dev",
+				"provider-properties": {
+					"@dbeaver-connection-type@": "BASIC",
+					"@dbeaver-sid-service@": "SERVICE"
+				},
+				"auth-model": "oracle_native"
+			}
+		}
+	},
+	"virtual-models": {"oracle_thin-188fff48295-1e59d20336071d5a":{"HR":{":VIEW_EMPLOYEES":{"properties":{"erd.diagram.state":{"serialized":"\u003cdiagram version\u003d\"1\" name\u003d\"empty\" time\u003d\"202307051752\"\u003e\u003centities\u003e\u003cdata-source id\u003d\"oracle_thin-188fff48295-1e59d20336071d5a\"\u003e\u003centity id\u003d\"1\" name\u003d\"VIEW_EMPLOYEES\" fq-name\u003d\"HR.VIEW_EMPLOYEES\" order\u003d\"0\" color-bg\u003d\"128,64,32\" x\u003d\"300\" y\u003d\"60\"\u003e\u003cpath name\u003d\"HR\"/\u003e\u003c/entity\u003e\u003c/data-source\u003e\u003c/entities\u003e\u003crelations/\u003e\u003c/diagram\u003e"}}}}}},
+	"connection-types": {
+		"dev": {
+			"name": "Development",
+			"color": "255,255,255",
+			"description": "Regular development database",
+			"auto-commit": true,
+			"confirm-execute": false,
+			"confirm-data-change": false,
+			"smart-commit": false,
+			"smart-commit-recover": true,
+			"auto-close-transactions": true,
+			"close-transactions-period": 1800
+		}
+	}
+}

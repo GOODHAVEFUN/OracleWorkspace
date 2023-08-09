@@ -1,0 +1,356 @@
+--GROUP BY, HAVING
+--	GROUP BY 절은 특정 컬럼에 있는 값을 그룹으로 묶어서 데이터 집계
+--	SELETE WHERE GROUP BY ORDER BY
+SELECT 
+	DEPARTMENT_ID ,
+	COUNT(EMPLOYEE_ID) 
+FROM EMPLOYEES e 
+GROUP BY DEPARTMENT_ID 
+ORDER BY COUNT(EMPLOYEE_ID) DESC;
+
+SELECT 
+	DEPARTMENT_ID , 
+	COUNT(EMPLOYEE_ID) 
+FROM EMPLOYEES e 
+GROUP BY DEPARTMENT_ID 
+HAVING DEPARTMENT_ID <= 50
+ORDER BY COUNT(EMPLOYEE_ID) DESC;
+
+--SQL 실행순서
+--	FROM > ON > JOIN > WHERE > GROUP BY > HAVING > SELECT > ORDER BY
+--
+--서브쿼리
+--	SQL 쿼리문 안에 포함된 또 다른 쿼리문
+--	FROM
+--	SELECT
+--	WHERE
+
+--JOIN
+--	여러 테이블에 흩어져 있는 정보 중 사용자가 필요한 정보만 가져와서
+--	가상 테이블을 만들고 결과를 보여주는것
+--
+--	정규화 진행하면 조회 테이블이 많이 쪼개져 있으면 작업이 불편하기 때문에
+--	입력, 수정, 삭제의 성능을 향상시키기 위해 JOIN 합친 후 작업한다
+--
+--내부조인
+--	조건이 정확히 일치하는 값만 합쳐서 조회
+--	
+--등가조인
+--	ON절에 = 등호가 있을 때
+--
+--비등가조인
+--	ON절에 등호가 없을 때
+--
+--자기조인(Self Join)
+--	하나의 테이블 내에서 자기 자신을 조인하는 것을 의미한다
+--	테이블 내에 있는 관계를 찾거나 계층구조를 처리할 때 사용된다
+--	계층구조 : 자기조인을 사용하여 상위와 하위요소를 연결할 수 있다
+--	관계확인 : 테이블 내에 있는 관계를 확인하기 위해 자기조인을 사용할 수 있다
+--
+--	select E1.employee_name, E2.employee_name
+--	from employees E1
+--	join employees E2 on e1.manager_id = e2.manager_id
+
+-- 조인을 사용할 때는 테이블간 관계를 먼저 확인해야한다
+-- EMP 테이블에서 사원번호로 DEPT 테이블의 지역 검색
+
+
+-- 1. 축구 선수들 중에서 각 팀별로 키가 가장 큰 선수들의 전체 정보 조회
+
+-- 위 문제를 JOIN 없이 풀기
+-- (A, B) IN (C, D) : A = C AND B = D
+
+SELECT P.*
+FROM PLAYER P
+WHERE (P.TEAM_ID, P.HEIGHT) IN (
+  SELECT TEAM_ID, MAX(HEIGHT)
+  FROM PLAYER
+  GROUP BY TEAM_ID
+);
+
+-- 2. EMPLOYEES 테이블의 각 사원의 매니저의 직무 조회
+SELECT E.FIRST_NAME, E.LAST_NAME, J.JOB_TITLE
+FROM EMPLOYEES E
+JOIN EMPLOYEES M ON E.MANAGER_ID = M.EMPLOYEE_ID
+JOIN JOBS J ON M.JOB_ID = J.JOB_ID;
+
+-- 3. EMPLOYEES 테이블의 모든 사원의 이름과 부서명 조회
+SELECT E.FIRST_NAME, E.LAST_NAME, D.DEPARTMENT_NAME
+FROM EMPLOYEES E, DEPARTMENTS D
+WHERE E.DEPARTMENT_ID = D.DEPARTMENT_ID;
+
+-- 4. EMPLOYEES 테이블에서 매니저가 없는 사원의 이름과 직무 조회
+SELECT E.FIRST_NAME, E.LAST_NAME, D.DEPARTMENT_NAME
+FROM EMPLOYEES e 
+JOIN DEPARTMENTS d ON E.DEPARTMENT_ID = D.DEPARTMENT_ID
+WHERE E.MANAGER_ID IS NULL;
+
+-- 5. EMPLOYEES 테이블에서 직무별 평균 급여 조회
+SELECT J.JOB_TITLE, AVG(E.SALARY)
+FROM EMPLOYEES E, JOBS J
+WHERE E.JOB_ID = J.JOB_ID
+GROUP BY J.JOB_TITLE;
+
+-- 6. EMPLOYEES 테이블에서 매니저별로 직속 직원 사원수 조회
+SELECT M.FIRST_NAME, M.LAST_NAME, COUNT(E.EMPLOYEE_ID)
+-- 매니저 성과 이름, 직속 직원의 사원수
+FROM EMPLOYEES E
+JOIN EMPLOYEES M ON M.EMPLOYEE_ID  = E.MANAGER_ID	
+GROUP BY M.FIRST_NAME, M.LAST_NAME; -- 매니저 이름과 성으로 그룹화
+
+SELECT M.FIRST_NAME, M.LAST_NAME, COUNT(E.EMPLOYEE_ID)
+FROM EMPLOYEES E, EMPLOYEES M		-- EMPLOYEES 테이블을 E와 M으로 별칭지정	
+WHERE E.MANAGER_ID = M.EMPLOYEE_ID	-- 일치하는 조건(매니저-직원 관계 매칭)
+GROUP BY M.FIRST_NAME, M.LAST_NAME;
+
+
+CREATE TABLE TBL_GRADE( 
+	GRADE_NUM NUMBER,
+	GRADE_NAME VARCHAR2(1000),
+	CONSTRAINT PK_GRADE PRIMARY KEY(GRADE_NUM)
+);
+
+CREATE TABLE TBL_USER_TEST(
+	USER_NUM NUMBER,
+	USER_ID VARCHAR2(1000),
+	GRADE_NUM NUMBER,
+	CONSTRAINT PK_USER_TEST PRIMARY KEY(USER_NUM),
+	CONSTRAINT FK_USER_TEST FOREIGN KEY(GRADE_NUM)
+	REFERENCES TBL_GRADE(GRADE_NUM)
+);
+
+INSERT INTO TBL_GRADE 
+VALUES(1, 'VVIP');
+
+INSERT INTO TBL_USER_TEST
+VALUES(1, 'A', 1);
+
+SELECT * FROM TBL_GRADE;
+SELECT * FROM TBL_USER_TEST;
+
+SELECT * FROM TBL_GRADE G INNER JOIN TBL_USER_TEST U
+ON G.GRADE_NUM  = U.GRADE_NUM;
+
+SELECT * FROM TBL_GRADE G LEFT OUTER JOIN TBL_USER_TEST U
+ON G.GRADE_NUM = U.GRADE_NUM;
+-- LEFT OUTER JOIN은 왼쪽 테이블(TBL_GRADE)의 모든 행을 포함하고
+-- 조인 조건을 만족하는 경우 오른쪽 테이블(TBL_USER_TEST)의 행을 함께 반환함
+-- 조인 조건을 만족하지 않는 경우 오른쪽 테이블의 NULL 채워짐
+
+-- 형변환함수
+-- TO_CHAR()
+SELECT SYSDATE FROM DUAL;
+
+SELECT TO_CHAR(SYSDATE, 'YYYY.MM.DD')
+FROM DUAL;
+
+SELECT  TO_CHAR(SYSDATE, 'YYYY"년 "MM"월 "DD"일"')
+FROM DUAL;
+
+SELECT TO_CHAR(SYSDATE, 'YYYY/MM/DD-HH:MI:SS')
+FROM DUAL;
+
+-- 숫자에 콤마 찍기
+-- 형식보다 큰 자리수가 들어오면 데이터가 손상된다
+-- 형식 지정시 0 또는 9를 사용하며
+-- 9를 쓰면 값이 없을 때 공백이 들어간다
+-- 0을 쓰면 값이 없을 때 0이 들어간다
+-- FM을 형식 가장 왼쪽에 넣어주면 불필요한 공백을 없애준다
+
+SELECT TO_CHAR(1234321, 'FM999,999,999')
+FROM DUAL;
+
+-- TO_NUMBER()
+SELECT '1000'
+FROM DUAL;
+
+SELECT TO_NUMBER('1000')
+FROM DUAL;
+
+SELECT '1000' + '1000'
+FROM DUAL;
+
+-- TO_DATE()
+SELECT '1900-01-02'
+FROM DUAL;
+
+SELECT TO_DATE('1900-01-02', 'YYYY-MM-DD')
+FROM DUAL;
+
+-- 집합
+SELECT * FROM EMPLOYEES e
+WHERE DEPARTMENT_ID = 10;
+
+SELECT * FROM EMPLOYEES e
+WHERE DEPARTMENT_ID = 30;
+
+-- 두 테이블을 합집합으로 연결한다
+SELECT * FROM EMPLOYEES e
+WHERE DEPARTMENT_ID = 10
+UNION 
+SELECT * FROM EMPLOYEES e
+WHERE DEPARTMENT_ID = 30;
+
+-- UNION 중복 제거 확인
+-- EMPLOYEES 테이블에서 SALARY가 1500이상 3000이하, 2500이상 5000이하 조회한다
+SELECT SALARY FROM EMPLOYEES e
+WHERE SALARY BETWEEN 1500 AND 3000
+UNION
+SELECT SALARY FROM EMPLOYEES e
+WHERE SALARY BETWEEN 2500 AND 5000;
+-- UNION은 중복을 제거하는 작업을 추가로 하므로 UNION ALL보다 연산이 많아진다
+-- 중복을 제거할 필요가 없다면 UNION ALL을 사용하는 것이 효율적이다
+
+SELECT * FROM EMPLOYEES e;
+SELECT * FROM DEPARTMENTS d;
+
+-- 오류 : 열의 수가 다르면 UNION을 사용할 수 없다
+SELECT * FROM EMPLOYEES e
+UNION
+SELECT * FROM DEPARTMENTS d;
+
+-- 오류 : 열의 타입이 일치하지 않으면 UNION을 사용할 수 없다
+SELECT EMPLOYEE_ID, FIRST_NAME FROM EMPLOYEES e
+UNION
+SELECT DEPARTMENT_ID, MANAGER_ID
+FROM DEPARTMENTS d;
+
+-- 열의 개수와 열의 타입이 일치하면 UNION이 가능하다
+SELECT EMP_NO 번호, EMP_JOB 직장 FROM TBL_EMP
+UNION
+SELECT DEPT_NO, DEPT_NAME FROM TBL_DEPT;
+
+-- UNOIN이 두 테이블을 합치고 ORDER BY가 실행되므로
+-- 합쳐지기 이전의 컬럼명이나 소속을 이용해도 정렬이 되지 않는다
+SELECT EMP_NO 번호, EMP_NAME 이름, EMP_JOB 직장 FROM TBL_EMP
+UNION
+SELECT * FROM TBL_DEPT
+ORDER BY E.EMP_NO; -- 기존의 컬럼명으로 정렬 시도시 오류 발생
+--ORDER BY 번호; -- 정렬시 별칭을 사용한다
+
+-- 교집합
+SELECT PLAYER_NAME 이름, TEAM_ID 팀, HEIGHT 키, WEIGHT 몸무게
+FROM PLAYER p
+WHERE HEIGHT BETWEEN 185 AND 186
+INTERSECT
+SELECT PLAYER_NAME 이름, TEAM_ID 팀, HEIGHT 키, WEIGHT 몸무게
+FROM PLAYER p
+WHERE WEIGHT BETWEEN 76 AND 78;
+
+-- 차집합
+SELECT PLAYER_NAME 이름, TEAM_ID 팀, HEIGHT 키, WEIGHT 몸무게
+FROM PLAYER p
+WHERE HEIGHT BETWEEN 185 AND 186
+MINUS
+SELECT PLAYER_NAME 이름, TEAM_ID 팀, HEIGHT 키, WEIGHT 몸무게
+FROM PLAYER p
+WHERE WEIGHT BETWEEN 76 AND 78;
+
+-- VIEW
+-- PLAYER 테이블에서 나이 컬럼을 추가한 뷰 만들기
+
+SELECT * FROM PLAYER p;
+
+SELECT p.*, sysdate - birth_date FROM player p;
+SELECT p.*, (sysdate-birth_date)/365 FROM PLAYER p;
+SELECT p.*, round((sysdate-birth_date)/365) AGE FROM PLAYER p;
+
+CREATE VIEW VIEW_PLAYER AS SELECT p.*, round((sysdate-birth_date)/365) AGE FROM PLAYER p;
+
+SELECT * FROM VIEW_PLAYER;
+SELECT AGE FROM VIEW_PLAYER;
+
+-- [실습 30분까지]
+-- 1. EMPLOYEES 테이블에서 사원이름과 그 사원의 매니저이름이 있는 VIEW 만들기
+-- 단, LAST_NAME과 FIRST_NAME 연결하기
+-- (PK, FK는 없어지면 안됨)
+SELECT * FROM EMPLOYEES e ;
+
+-- SELF JOIN 해야함
+SELECT E1.LAST_NAME || ' ' || E1.FIRST_NAME 사원이름,
+	E2.LAST_NAME || ' ' || E2.FIRST_NAME 매니저이름
+FROM EMPLOYEES E1 JOIN EMPLOYEES E2
+ON E1.MANAGER_ID = E2.EMPLOYEE_ID;
+
+-- PK, FK는 제외시키면 안됨( ERD 확인하기 )
+SELECT 
+	E1.EMPLOYEE_ID,
+	E1.DEPARTMENT_ID,
+	E1.JOB_ID,
+	E1.LAST_NAME || ' ' || E1.FIRST_NAME 사원이름,
+	E2.LAST_NAME || ' ' || E2.FIRST_NAME 매니저이름
+FROM EMPLOYEES E1 JOIN EMPLOYEES E2
+ON E1.MANAGER_ID = E2.EMPLOYEE_ID;
+
+-- VIEW 만들기
+CREATE VIEW VIEW_EMPLOYEES AS 
+	SELECT 
+	E1.EMPLOYEE_ID,
+	E1.DEPARTMENT_ID,
+	E1.JOB_ID,
+	E1.LAST_NAME || ' ' || E1.FIRST_NAME 사원이름,
+	E2.LAST_NAME || ' ' || E2.FIRST_NAME 매니저이름
+FROM EMPLOYEES E1 JOIN EMPLOYEES E2
+ON E1.MANAGER_ID = E2.EMPLOYEE_ID;
+-- VIEW는 원본 테이블의 데이터를 가공, 필터링, 조인하는 등의 작업을 수행하기 위한 목적으로 사용된다
+-- 데이터의 무결성을 위한 제약조건은 원본 테이블에서 관리한다
+
+SELECT * FROM VIEW_EMPLOYEES;
+
+-- 2. PLYAER 테이블에 TEAM_NAME 컬럼을 추가한 VIEW 만들기
+SELECT * FROM TEAM t JOIN PLAYER P 
+ON t.TEAM_ID  = p.TEAM_ID;
+
+SELECT t.team_name, p.*
+FROM TEAM t JOIN PLAYER p
+ON t.TEAM_ID = p.TEAM_ID;
+
+CREATE VIEW VIEW_TEAM AS
+	SELECT t.team_name, p.*
+	FROM TEAM t JOIN PLAYER p
+	ON t.TEAM_ID = p.TEAM_ID;
+
+SELECT TEAM_NAME, PLAYER_NAME FROM VIEW_TEAM;
+
+-- 권한 부여
+GRANT UPDATE, DELETE, INSERT ON employees TO test;
+
+-- 권한 회수하기
+REVOKE SELECT, UPDATE, DELETE, INSERT ON employees from test;
+
+-- CASE
+-- EMPLOYEES 테이블에서
+-- 부서 ID가 50인 부서는 기존 급여에서 10% 삭감
+-- 부서 ID가 80인 부서는 기존 급여에서 10% 인상
+-- 나머지는 그대로
+-- 사원의 이름과 기존급여, 조정급여를 조회하기
+
+SELECT * FROM EMPLOYEES e;
+
+SELECT LAST_NAME || ' ' || FIRST_NAME NAME,
+	SALARY 기존급여,
+	CASE
+			WHEN DEPARTMENT_ID = 50 THEN SALARY * 0.9
+			WHEN DEPARTMENT_ID = 80 THEN SALARY * 1.1
+			ELSE SALARY
+	END 조정급여, DEPARTMENT_ID 
+FROM EMPLOYEES e;
+	
+-- 조건은 위에서부터 검사한다!!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

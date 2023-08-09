@@ -1,0 +1,104 @@
+CREATE TABLE TBL_USER(
+	user_name varchar2(1000),
+	user_age number
+);
+
+--테이블명 수정
+--ALTER TABLE TBL_USER RENAME TO TBL_MY_USER;
+
+-- 컬럼 추가 
+ALTER TABLE TBL_MY_USER ADD user_gender char(4);
+SELECT * FROM TBL_MY_USER ;
+
+-- 컬럼명 수정
+ALTER TABLE TBL_MY_USER RENAME COLUMN USER_NAME TO USER_NICKNAME;
+SELECT * FROM TBL_MY_USER ;
+
+--컬럼 삭제
+ALTER TABLE TBL_MY_USER DROP COLUMN  user_gender;
+SELECT * FROM TBL_MY_USER ;
+
+--컬럼타입 수정
+ALTER TABLE TBL_MY_USER MODIFY(user_age varchar2(500));
+SELECT * FROM TBL_MY_USER ;
+
+
+-- A, 20
+INSERT INTO TBL_MY_USER 
+values('A',20);
+INSERT INTO TBL_MY_USER 
+values('B',20);
+SELECT * FROM TBL_MY_USER ;
+
+TRUNCATE TABLE TBL_MY_USER ;
+SELECT * FROM TBL_MY_USER ;
+
+DROP TABLE TBL_MY_USER ;
+
+/*
+ [실습]
+ 자동차 테이블 생성
+ 자동차번호
+ 자동차이름
+ 자동차 브랜드
+ 출시날짜
+ 색상
+ 가격
+ */
+ 
+CREATE TABLE TBL_CAR(
+car_number NUMBER,
+car_name varchar2(1000),
+car_brand varCHAR2(1000),
+   CAR_RELEASE_DATE DATE,
+   CAR_COLOR VARCHAR2(1000),
+   CAR_PRICE NUMBER
+);
+
+ALTER TABLE TBL_CAR  ADD constraint pk_car PRIMARY KEY(car_number);
+--ALTER table TBL_CAR  : 테이블을 수정하겠다 TBL_CAR 테이블
+-- ADD : 추가한다
+-- constraint 제약조건
+-- pk_car
+
+ALTER TABLE tbl_CAR DROP CONSTRAINT pk_car;
+--제약조건울 
+
+DROP TABLE TBL_CAR ;
+
+CREATE TABLE TBL_CAR(
+car_number NUMBER CONSTRAINT PK_CAR PRIMARY KEY,
+car_name varchar2(1000),
+car_brand varCHAR2(1000),
+   CAR_RELEASE_DATE DATE,
+   CAR_COLOR VARCHAR2(1000),
+   CAR_PRICE NUMBER
+);
+
+ALTER TABLE TBL_CAR DROP CONSTRAINT SYS_C006998;
+
+--PK를 가진 테이블에 값 넣기
+--상품(PRODUCT) 테이블 생성
+--제약조건 PK 설정
+--상품번호 PK_product
+--이름
+--가격
+
+CREATE TABLE TBL_PRODUCT(
+	product_number NUMBER CONSTRAINT pk_product PRIMARY KEY,
+	product_name varchar2(500),
+	product_price varchar2(500)
+);
+
+SELECT * FROM TBL_product;
+
+INSERT INTO TBL_PRODUCT 
+VALUES (1,'아이패드',790000);
+INSERT INTO TBL_PRODUCT 
+VALUES (2,'갤럭시워치 ',300000);
+INSERT INTO TBL_PRODUCT 
+VALUES (1,'갤럭시 탭',1000000); --pk 중보허용x
+--INSERT INTO TBL_PRODUCT 
+--VALUES (null,'갤럭시 탭',1000000);--pk 에 null값 허용 x
+
+

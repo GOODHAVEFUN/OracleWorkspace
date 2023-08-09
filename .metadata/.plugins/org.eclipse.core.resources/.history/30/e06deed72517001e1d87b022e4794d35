@@ -1,0 +1,166 @@
+SELECT * FROM tbl_book;
+SELECT * FROM TBL_MEMBER;
+
+INSERT INTO TBL_MEMBER VALUES (1, '홍길동', 22, '010-1111-2551','서울시');
+INSERT INTO TBL_MEMBER VALUES (2, '신짱구', 22, '010-1123-2551','서울시');
+INSERT INTO TBL_MEMBER VALUES (3, '김철수', 22, '010-1113-2551','경기도');
+
+INSERT INTO TBL_BOOK VALUES (1, '셜록','추리',null);
+INSERT INTO TBL_BOOK VALUES (2, 'JDBC','IT',null);
+INSERT INTO TBL_BOOK VALUES (3, '하면된다','인문학',null);
+
+--회원이름 수정
+UPDATE TBL_MEMBER 
+SET MEMBER_NAME = '박수정'
+WHERE MEMBER_NUMBER = 2;
+SELECT * FROM TBL_MEMBER;
+
+--책 대여
+UPDATE TBL_BOOK 
+SET MEMBER_number = 3
+WHERE book_number = 1;
+
+UPDATE TBL_BOOK 
+SET MEMBER_number = 2
+WHERE book_number = 1;
+
+UPDATE TBL_BOOK 
+SET member_number = 2
+WHERE book_number = 3;
+
+SELECT * FROM tbl_book;
+
+
+--책대여한 회원정보 수정
+UPDATE
+	TBL_BOOK
+SET
+	member_number = 1
+WHERE
+	book_number = 3;
+	
+--회원삭제
+--null 값으로 변경 후 book_number = 3
+UPDATE TBL_BOOK 
+SET member_number = NULL 
+WHERE book_number = 3;
+
+--DROP 2
+DELETE  FROM TBL_book
+WHERE book_number = 3;
+
+SELECT * FROM tbl_book;
+
+
+--시퀀스 생성
+CREATE  SEQUENCE seq_book;
+CREATE  SEQUENCE seq_member;
+
+--시퀀스 삭제
+DROP SEQUENCE seq_member;
+
+-- 테이블 데이터 모두 삭제
+DELETE FROM tbl_book;
+DELETE FROM tbl_member;
+
+--시퀀스를 사용하여 데이터 넣기
+
+INSERT INTO TBL_MEMBER VALUES (seq_member.nextval, '홍길동', 22, '010-1111-2551','서울시');
+INSERT INTO TBL_MEMBER VALUES (seq_member.nextval, '신짱구', 22, '010-1123-2551','서울시');
+INSERT INTO TBL_MEMBER VALUES (seq_member.nextval, '김철수', 22, '010-1113-2551','경기도');
+
+SELECT * FROM TBL_MEMBER;
+
+INSERT INTO TBL_BOOK VALUES (seq_BOOK.nextval, '셜록','추리',null);
+INSERT INTO TBL_BOOK VALUES (seq_BOOK.nextval, 'JDBC','IT',null);
+INSERT INTO TBL_BOOK VALUES (seq_BOOK.nextval, '하면된다','인문학',null);
+
+SELECT * FROM TBL_BOOK;
+
+
+/*
+ * 삭제 시 참조중인 자식 FK가 있으면 자식부터 지워야한다
+ * 하지만 이런 번거로운 작업을 해결하기 위해 FK 제약조건 뒤에 ON DELETE CASCADE 옵션을 작성할 수 있다
+ * 해당 옵션이 추가되면, 부모 삭제 시 참조중인 모든 자식 데이터가 자동으로 삭제된다
+ * 
+ *  */
+
+SELECT * FROM TBL_BOOK;
+
+ALTER TABLE TBL_BOOK
+DROP CONSTRAINT FK_BOOK; -- DROP CONSTRANINT는 테이블에서 제약조건을 제거하는 명령
+
+ALTER TABLE TBL_BOOK
+ADD CONSTRAINT FK_BOOK FOREIGN KEY(MEMBER_NUMBER)
+REFERENCES TBL_MEMBER(MEMBER_NUMBER) ON DELETE CASCADE;
+
+-- 대여하기
+UPDATE TBL_BOOK
+SET MEMBER_NUMBER = 4
+WHERE BOOK_NUMBER = 1;
+
+SELECT * FROM TBL_MEMBER;
+
+UPDATE TBL_BOOK
+SET MEMBER_NUMBER = 5
+WHERE BOOK_NUMBER = 2;
+
+SELECT * FROM TBL_BOOK;
+
+-- 부모 테이블의 데이터 바로 삭제하기
+SELECT * FROM TBL_MEMBER;
+
+DELETE FROM TBL_MEMBER
+WHERE MEMBER_NUMBER = 1;
+
+INSERT INTO TBL_BOOK
+VALUES(SEQ_BOOK.NEXTVAL, 'A','로맨스',NULL);
+
+INSERT INTO TBL_BOOK
+VALUES(SEQ_BOOK.NEXTVAL, 'B','추리',NULL);
+
+INSERT INTO TBL_BOOK
+VALUES(SEQ_BOOK.NEXTVAL, 'C','인문학',NULL);
+
+SELECT  * FROM TBL_BOOK ;
+SELECT  * FROM TBL_MEMBER tm ;
+
+INSERT INTO TBL_MEMBER
+VALUES(SEQ_MEMBER.NEXTVAL, '이유리',20,'010-5678-9193','서울시');
+
+UPDATE TBL_BOOK 
+SET MEMBER_NUMBER = 6
+WHERE BOOK_CATEGORY = '인문학'
+
+--IS NULL 
+SELECT * FROM TBL_BOOK WHERE MEMBER_NUMBER IS NULL;
+
+SELECT * FROM TBL_BOOK 
+WHERE MEMBER_NUMBER IS NOT NULL;
+
+SELECT * FROM TBL_BOOK;
+
+-- NVL()
+SELECT
+	BOOK_NUMBER,
+	BOOK_NAME ,
+	BOOK_CATEGORY ,
+	NVL(MEMBER_NUMBER, 0)
+FROM
+	TBL_BOOK 
+
+--NVL2()
+SELECT 
+BOOK_NUMBER,
+BOOK_NAME,
+BOOK_CATEGORY,
+NVL2(MEMBER_NUMBER,'대여중','대여가능') 대여여부
+FROM TBL_BOOK ;
+
+SELECT * FROM player;
+
+--player 테이블에서 team_id가 k01인 선수 조회
+SELECT *FROM PLAYER 
+WHERE team_id ='K01';
+
+
